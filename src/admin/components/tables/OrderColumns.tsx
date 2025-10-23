@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { UserType } from "../../types";
+import { OrderType } from "../../types";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import {
@@ -12,40 +12,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import EditUserDialog from "../EditUserDialog";
+import EditOrderDialog from "../EditOrderDialog";
 
-export const userColumns = (
-  onEdit: (user: UserType) => void,
+export const orderColumns = (
+  onEdit: (order: OrderType) => void,
   onDelete: (id: string) => void
-): ColumnDef<UserType>[] => [
+): ColumnDef<OrderType>[] => [
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div className="font-medium">#{row.getValue("id")}</div>,
-  },
-  {
-    id: "name",
-    header: "Name",
-    cell: ({ row }) => (
-      <div className="font-medium">
-        {row.original.firstName} {row.original.lastName}
-      </div>
-    ),
+    accessorKey: "_id",
+    header: "Order ID",
+    cell: ({ row }) => <div className="font-medium">#{row.getValue("_id")}</div>,
   },
   {
     accessorKey: "email",
     header: "Email",
   },
   {
-    accessorKey: "role",
-    header: "Role",
+    accessorKey: "amount",
+    header: "Amount",
     cell: ({ row }) => {
-      const role = row.getValue("role") as string;
-      return (
-        <Badge variant={role === "admin" ? "default" : "secondary"}>
-          {role}
-        </Badge>
-      );
+      const amount = row.getValue("amount") as number;
+      return <span>${(amount / 100).toFixed(2)}</span>;
     },
   },
   {
@@ -54,16 +41,24 @@ export const userColumns = (
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       return (
-        <Badge variant={status === "active" ? "default" : "destructive"}>
+        <Badge variant={status === "success" ? "default" : "destructive"}>
           {status}
         </Badge>
       );
     },
   },
   {
+    accessorKey: "createdAt",
+    header: "Date",
+    cell: ({ row }) => {
+      const date = row.getValue("createdAt") as Date;
+      return new Date(date).toLocaleDateString();
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const order = row.original;
       const [editOpen, setEditOpen] = useState(false);
 
       return (
@@ -83,7 +78,7 @@ export const userColumns = (
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onDelete(user.id)}
+                onClick={() => onDelete(order._id)}
                 className="text-red-600"
               >
                 <Trash className="mr-2 h-4 w-4" />
@@ -92,11 +87,11 @@ export const userColumns = (
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <EditUserDialog
-            user={user}
+          <EditOrderDialog
+            order={order}
             open={editOpen}
             onOpenChange={setEditOpen}
-            onEditUser={onEdit}
+            onEditOrder={onEdit}
           />
         </>
       );

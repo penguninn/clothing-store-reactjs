@@ -26,7 +26,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "./ui/sidebar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,12 +63,21 @@ const items = [
 ];
 
 const AppSidebar = () => {
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    if (path === "/admin") {
+      return location.pathname === "/admin";
+    }
+    return location.pathname.startsWith(path) && path !== "#";
+  };
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={location.pathname === "/admin"}>
               <Link to="/admin">
                 <img src="/logo.png" alt="Clothing" className="w-5 h-5" />
                 <span>Clothing</span>
@@ -85,7 +94,7 @@ const AppSidebar = () => {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -107,14 +116,13 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild isActive={isActive("/admin/products")}>
                   <Link to="/admin/products">
                     <Shirt />
                     See All Products
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* TODO: Add Product Form */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="#">
@@ -123,7 +131,6 @@ const AppSidebar = () => {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* TODO: Add Category Form */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="#">
@@ -143,14 +150,13 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild isActive={isActive("/admin/users")}>
                   <Link to="/admin/users">
                     <User />
                     See All Users
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* TODO: Add User Form */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="#">
@@ -170,14 +176,13 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild isActive={isActive("/admin/orders")}>
                   <Link to="/admin/orders">
                     <ShoppingBasket />
                     See All Transactions
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* TODO: Add Order Form */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="#">

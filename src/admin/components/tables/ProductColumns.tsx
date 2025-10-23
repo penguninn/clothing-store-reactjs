@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import {
@@ -10,10 +11,13 @@ import {
 } from "../ui/dropdown-menu";
 import { ProductType } from "../../types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import EditProductDialog from "../EditProductDialog";
 
-export const productColumns: ColumnDef<ProductType>[] = [
+export const productColumns = (
+  onEdit: (product: ProductType) => void,
+  onDelete: (id: number) => void
+): ColumnDef<ProductType>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -75,30 +79,41 @@ export const productColumns: ColumnDef<ProductType>[] = [
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
+      const [editOpen, setEditOpen] = useState(false);
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(product.id.toString())
-              }
-            >
-              Copy product ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link to={`/products/${product.id}`}>View product</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(product.id)}
+                className="text-red-600"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <EditProductDialog
+            product={product}
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            onEditProduct={onEdit}
+          />
+        </>
       );
     },
   },

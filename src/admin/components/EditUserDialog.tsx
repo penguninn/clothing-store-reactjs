@@ -32,7 +32,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onEditUser }: EditUserDialog
     defaultValues: user,
   });
 
-  const [role, setRole] = useState<"admin" | "customer">(user.role);
+  const [role, setRole] = useState<"admin" | "user">(user.role);
   const [status, setStatus] = useState<"active" | "inactive">(user.status);
 
   useEffect(() => {
@@ -57,15 +57,28 @@ const EditUserDialog = ({ user, open, onOpenChange, onEditUser }: EditUserDialog
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                {...register("name", { required: "Name is required" })}
-              />
-              {errors.name && (
-                <p className="text-xs text-red-500">{errors.name.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  {...register("firstName", { required: "First name is required" })}
+                />
+                {errors.firstName && (
+                  <p className="text-xs text-red-500">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  {...register("lastName", { required: "Last name is required" })}
+                />
+                {errors.lastName && (
+                  <p className="text-xs text-red-500">{errors.lastName.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="grid gap-2">
@@ -88,7 +101,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onEditUser }: EditUserDialog
 
             <div className="grid gap-2">
               <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(value: "admin" | "customer") => {
+              <Select value={role} onValueChange={(value: "admin" | "user") => {
                 setRole(value);
                 setValue("role", value);
               }}>
@@ -96,7 +109,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onEditUser }: EditUserDialog
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>

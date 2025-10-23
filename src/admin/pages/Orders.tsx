@@ -1,55 +1,62 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { DataTable } from "../components/tables/DataTable";
+import { orderColumns } from "../components/tables/OrderColumns";
 import { mockOrders } from "../data/mockData";
-import { OrderType } from "../types";
-import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import AddOrderDialog from "../components/AddOrderDialog";
+import type { OrderType } from "../types";
 
 const OrdersPage = () => {
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [ordersData, setOrdersData] = useState<OrderType[]>(mockOrders);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  useEffect(() => {
-    // Simulate fetching data
-    setOrders(mockOrders);
-  }, []);
+  const handleAddOrder = (newOrder: Omit<OrderType, "_id" | "createdAt" | "updatedAt">) => {
+    const order: OrderType = {
+      ...newOrder,
+      _id: `order_${Date.now()}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setOrdersData([order, ...ordersData]);
+    setIsAddDialogOpen(false);
+  };
+
+  const handleEditOrder = (updatedOrder: OrderType) => {
+    setOrdersData(ordersData.map((o) => (o._id === updatedOrder._id ? updatedOrder : o)));
+  };
+
+  const handleDeleteOrder = (id: string) => {
+    if (confirm("Are you sure you want to delete this order?")) {
+      setOrdersData(ordersData.filter((o) => o._id !== id));
+    }
+  };
 
   return (
-    <div>
-      <div className="mb-8 px-4 py-2 bg-secondary rounded-md">
-        <h1 className="font-semibold">All Orders</h1>
+    <div className="p-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Orders</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage customer orders
+          </p>
+        </div>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Order
+        </Button>
       </div>
-      <div className="rounded-md border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left">Order ID</th>
-              <th className="p-4 text-left">Email</th>
-              <th className="p-4 text-left">Amount</th>
-              <th className="p-4 text-left">Status</th>
-              <th className="p-4 text-left">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id} className="border-b">
-                <td className="p-4">{order._id}</td>
-                <td className="p-4">{order.email}</td>
-                <td className="p-4">${(order.amount / 100).toFixed(2)}</td>
-                <td className="p-4">
-                  <Badge
-                    variant={
-                      order.status === "success" ? "default" : "destructive"
-                    }
-                  >
-                    {order.status}
-                  </Badge>
-                </td>
-                <td className="p-4">
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+      <DataTable
+        columns={orderColumns(handleEditOrder, handleDeleteOrder)}
+        data={ordersData}
+      />
+
+      <AddOrderDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAddOrder={handleAddOrder}
+      />
     </div>
   );
 };

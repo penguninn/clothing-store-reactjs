@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Upload, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -9,16 +9,36 @@ import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import type { ProductType } from "../types";
 
-interface AddProductDialogProps {
+interface EditProductDialogProps {
+  product: ProductType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddProduct: (product: Omit<ProductType, "id" | "createdAt" | "updatedAt">) => void;
+  onEditProduct: (product: ProductType) => void;
 }
 
-const AddProductDialog = ({ open, onOpenChange, onAddProduct }: AddProductDialogProps) => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
-  const [categorySlug, setCategorySlug] = useState<string>("t-shirts");
-  const [imagePreview, setImagePreview] = useState<string>("");
+const EditProductDialog = ({ product, open, onOpenChange, onEditProduct }: EditProductDialogProps) => {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    defaultValues: {
+      name: product.name,
+      shortDescription: product.shortDescription,
+      description: product.description,
+      price: product.price,
+    }
+  });
+
+  const [categorySlug, setCategorySlug] = useState<string>(product.categorySlug);
+  const [imagePreview, setImagePreview] = useState<string>(product.images.gray || "");
+
+  useEffect(() => {
+    reset({
+      name: product.name,
+      shortDescription: product.shortDescription,
+      description: product.description,
+      price: product.price,
+    });
+    setCategorySlug(product.categorySlug);
+    setImagePreview(product.images.gray || "");
+  }, [product, reset]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -32,27 +52,25 @@ const AddProductDialog = ({ open, onOpenChange, onAddProduct }: AddProductDialog
   };
 
   const onSubmit = (data: any) => {
-    onAddProduct({
+    onEditProduct({
+      ...product,
       name: data.name,
       shortDescription: data.shortDescription,
       description: data.description,
       price: Number(data.price),
-      sizes: ["s", "m", "l", "xl"],
-      colors: ["gray"],
-      images: { gray: imagePreview || "/products/1g.png" },
+      images: { gray: imagePreview },
       categorySlug,
+      updatedAt: new Date(),
     });
-    reset();
-    setImagePreview("");
-    setCategorySlug("t-shirts");
+    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Product</DialogTitle>
-          <DialogDescription>Create a new product in your inventory.</DialogDescription>
+          <DialogTitle>Edit Product</DialogTitle>
+          <DialogDescription>Update product information.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
@@ -145,7 +163,7 @@ const AddProductDialog = ({ open, onOpenChange, onAddProduct }: AddProductDialog
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Add Product</Button>
+            <Button type="submit">Save Changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -153,4 +171,4 @@ const AddProductDialog = ({ open, onOpenChange, onAddProduct }: AddProductDialog
   );
 };
 
-export default AddProductDialog;
+export default EditProductDialog;
