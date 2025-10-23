@@ -10,11 +10,11 @@ const Navbar = () => {
       <Link to="/" className="flex items-center">
         <img
           src="/logo.png"
-          alt="TrendLama"
+          alt="Clothing"
           className="w-6 h-6 md:w-9 md:h-9"
         />
         <p className="hidden md:block text-md font-medium tracking-wider">
-          TRENDLAMA.
+          CLOTHING.
         </p>
       </Link>
       {/* RIGHT */}
@@ -25,10 +25,12 @@ const Navbar = () => {
         </Link>
         <Bell className="w-4 h-4 text-gray-600" />
         <ShoppingCartIcon />
-        {/* TODO: Add authentication UI here */}
-        <button className="text-sm text-gray-600 hover:text-gray-800">
+        <Link
+          to="/signin"
+          className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+        >
           Sign In
-        </button>
+        </Link>
       </div>
     </nav>
   );
