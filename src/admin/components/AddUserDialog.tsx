@@ -23,28 +23,29 @@ import type { UserType } from "../types";
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddUser: (user: Omit<UserType, "id">) => void;
+  onAddUser: (user: Omit<UserType, "id" | "createdAt">) => void;
 }
 
-type UserFormData = Omit<UserType, "id">;
+type UserFormData = Omit<UserType, "id" | "createdAt">;
 
 const AddUserDialog = ({ open, onOpenChange, onAddUser }: AddUserDialogProps) => {
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<UserFormData>({
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
-      role: "customer",
+      role: "user",
       status: "active",
     },
   });
 
-  const [role, setRole] = useState<"admin" | "customer">("customer");
+  const [role, setRole] = useState<"admin" | "user">("user");
   const [status, setStatus] = useState<"active" | "inactive">("active");
 
   const onSubmit = (data: UserFormData) => {
     onAddUser({ ...data, role, status });
     reset();
-    setRole("customer");
+    setRole("user");
     setStatus("active");
   };
 
@@ -59,16 +60,30 @@ const AddUserDialog = ({ open, onOpenChange, onAddUser }: AddUserDialogProps) =>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                {...register("name", { required: "Name is required" })}
-              />
-              {errors.name && (
-                <p className="text-xs text-red-500">{errors.name.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="John"
+                  {...register("firstName", { required: "First name is required" })}
+                />
+                {errors.firstName && (
+                  <p className="text-xs text-red-500">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Doe"
+                  {...register("lastName", { required: "Last name is required" })}
+                />
+                {errors.lastName && (
+                  <p className="text-xs text-red-500">{errors.lastName.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="grid gap-2">
@@ -92,7 +107,7 @@ const AddUserDialog = ({ open, onOpenChange, onAddUser }: AddUserDialogProps) =>
 
             <div className="grid gap-2">
               <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(value: "admin" | "customer") => {
+              <Select value={role} onValueChange={(value: "admin" | "user") => {
                 setRole(value);
                 setValue("role", value);
               }}>
@@ -100,7 +115,7 @@ const AddUserDialog = ({ open, onOpenChange, onAddUser }: AddUserDialogProps) =>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>

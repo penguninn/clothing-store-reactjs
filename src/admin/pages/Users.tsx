@@ -2,19 +2,20 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { DataTable } from "../components/tables/DataTable";
 import { userColumns } from "../components/tables/UserColumns";
-import { users } from "../data/mockData";
+import { mockUsers } from "../data/mockData";
 import { Button } from "../components/ui/button";
 import AddUserDialog from "../components/AddUserDialog";
 import type { UserType } from "../types";
 
 const UsersPage = () => {
-  const [usersData, setUsersData] = useState<UserType[]>(users);
+  const [usersData, setUsersData] = useState<UserType[]>(mockUsers);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleAddUser = (newUser: Omit<UserType, "id">) => {
+  const handleAddUser = (newUser: Omit<UserType, "id" | "createdAt">) => {
     const user: UserType = {
       ...newUser,
-      id: Math.max(...usersData.map((u) => u.id)) + 1,
+      id: `user_${Date.now()}`,
+      createdAt: new Date(),
     };
     setUsersData([user, ...usersData]);
     setIsAddDialogOpen(false);
@@ -24,7 +25,7 @@ const UsersPage = () => {
     setUsersData(usersData.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
   };
 
-  const handleDeleteUser = (id: number) => {
+  const handleDeleteUser = (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
       setUsersData(usersData.filter((u) => u.id !== id));
     }

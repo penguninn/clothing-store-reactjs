@@ -15,10 +15,12 @@ const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  const handleAddProduct = (newProduct: Omit<ProductType, "id">) => {
+  const handleAddProduct = (newProduct: Omit<ProductType, "id" | "createdAt" | "updatedAt">) => {
     const product: ProductType = {
       ...newProduct,
       id: Math.max(...productsData.map((p) => p.id)) + 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setProductsData([product, ...productsData]);
     setIsAddDialogOpen(false);
@@ -38,7 +40,7 @@ const ProductsPage = () => {
   const filteredProducts = productsData.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
+    const matchesCategory = categoryFilter === "all" || product.categorySlug === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
