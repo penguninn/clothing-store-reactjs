@@ -58,6 +58,36 @@
   }
 }
 
+/* Ensure all popover/dropdown/modal elements have solid backgrounds */
+@layer components {
+  [data-slot="dropdown-menu-content"],
+  [data-slot="popover-content"],
+  [data-slot="select-content"] {
+    background-color: hsl(var(--popover)) !important;
+    opacity: 1 !important;
+  }
+
+  .dark [data-slot="dropdown-menu-content"],
+  .dark [data-slot="popover-content"],
+  .dark [data-slot="select-content"] {
+    background-color: hsl(var(--popover)) !important;
+    opacity: 1 !important;
+  }
+
+  /* Dialog/Modal specific fixes - target Radix UI Dialog elements */
+  [data-radix-dialog-content],
+  [role="dialog"] {
+    background-color: hsl(var(--background)) !important;
+    opacity: 1 !important;
+  }
+
+  .dark [data-radix-dialog-content],
+  .dark [role="dialog"] {
+    background-color: hsl(var(--background)) !important;
+    opacity: 1 !important;
+  }
+}
+
 @layer base {
   * {
     border-color: hsl(var(--border));
